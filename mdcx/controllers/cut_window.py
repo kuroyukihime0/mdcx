@@ -179,7 +179,7 @@ class CutWindow(QDialog):
         self.Ui.radioButton_add_no.setChecked(True)
         self.Ui.radioButton_add_no_2.setChecked(True)
         self.pic_h_w_ratio = 1.5
-        self.rect_h_w_ratio = 536.6 / 379  # 裁剪框默认高宽比
+        self.rect_h_w_ratio = 1.5  # 裁剪框默认高宽比
         self.show_image_path = img_path
         self.cut_thumb_path = ""  # 裁剪后的thumb路径
         self.cut_poster_path = ""  # 裁剪后的poster路径

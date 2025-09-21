@@ -6,9 +6,10 @@ import urllib.parse
 
 from lxml import etree
 
-from mdcx.config.manager import config
-from mdcx.models.log_buffer import LogBuffer
-from mdcx.signals import signal
+from ..config.enums import Website
+from ..config.manager import manager
+from ..models.log_buffer import LogBuffer
+from ..signals import signal
 
 
 def get_web_number(html):
@@ -102,7 +103,7 @@ def get_series(html):
 
 
 async def retry_request(real_url, web_info):
-    html_content, error = await config.async_client.get_text(real_url)
+    html_content, error = await manager.computed.async_client.get_text(real_url)
     if html_content is None:
         debug_info = f"网络请求错误: {error} "
         LogBuffer.info().write(web_info + debug_info)
@@ -152,7 +153,7 @@ async def main(
     image_cut = "right"
     image_download = False
     mosaic = "有码"
-    airav_url = getattr(config, "airav_cc_website", "https://airav.io")
+    airav_url = manager.config.get_site_url(Website.AIRAV_CC, "https://airav.io")
     if language == "zh_cn":
         airav_url += "/cn"
     web_info = "\n       "
@@ -168,7 +169,7 @@ async def main(
             LogBuffer.info().write(web_info + debug_info)
 
             # ========================================================================搜索番号
-            html_search, error = await config.async_client.get_text(url_search)
+            html_search, error = await manager.computed.async_client.get_text(url_search)
             if html_search is None:
                 debug_info = f"网络请求错误: {error} "
                 LogBuffer.info().write(web_info + debug_info)

@@ -4,10 +4,11 @@ import time
 
 from lxml import etree
 
-from mdcx.config.manager import config
-from mdcx.crawlers.guochan import get_extra_info
-from mdcx.models.log_buffer import LogBuffer
-from mdcx.number import is_uncensored
+from ..config.enums import Website
+from ..config.manager import manager
+from ..models.log_buffer import LogBuffer
+from ..number import is_uncensored
+from .guochan import get_extra_info
 
 
 def get_actor_photo(actor):
@@ -178,7 +179,7 @@ async def main(
     web_info = "\n       "
     LogBuffer.info().write(" \n    🌐 7mmtv")
     debug_info = ""
-    mmtv_url = getattr(config, "7mmtv_website", "https://www.7mmtv.sx")
+    mmtv_url = manager.config.get_site_url(Website.MMTV, "https://www.7mmtv.sx")
     real_url = appoint_url
     # search_url = "https://bb9711.com/zh/searchform_search/all/index.html"
     # search_url = "https://7mmtv.sx/zh/searchform_search/all/index.html"
@@ -194,7 +195,7 @@ async def main(
             search_url = f"{search_url}?search_keyword={search_keyword}&search_type=searchall&op=search"
             debug_info = f"搜索地址: {search_url} "
             LogBuffer.info().write(web_info + debug_info)
-            response, error = await config.async_client.get_text(search_url)
+            response, error = await manager.computed.async_client.get_text(search_url)
 
             if response is None:
                 debug_info = f"网络请求错误: {error}"
@@ -212,7 +213,7 @@ async def main(
                 raise Exception(debug_info)
 
         if real_url:
-            html_content, error = await config.async_client.get_text(real_url)
+            html_content, error = await manager.computed.async_client.get_text(real_url)
             if html_content is None:
                 debug_info = f"网络请求错误: {error}"
                 LogBuffer.info().write(web_info + debug_info)

@@ -3,8 +3,8 @@ import time
 
 from lxml import etree
 
-from mdcx.config.manager import config
-from mdcx.models.log_buffer import LogBuffer
+from ..config.manager import manager
+from ..models.log_buffer import LogBuffer
 
 
 def get_title(html):  # 获取标题
@@ -80,7 +80,7 @@ async def main(
         debug_info = f"番号地址: {real_url}"
         LogBuffer.info().write(web_info + debug_info)
         # ========================================================================番号详情页
-        html_content, error = await config.async_client.get_text(url_search)
+        html_content, error = await manager.computed.async_client.get_text(url_search)
         if html_content is None:
             debug_info = f"网络请求错误: {error}"
             LogBuffer.info().write(web_info + debug_info)
@@ -106,7 +106,7 @@ async def main(
         video_url = get_video_url(html_info)
         video_time = get_video_time(html_info)
         tag = tag.replace("無修正,", "").replace("無修正", "").strip(",")
-        if "fc2_seller" in config.fields_rule:
+        if "fc2_seller" in manager.config.fields_rule:
             actor = studio
 
         try:

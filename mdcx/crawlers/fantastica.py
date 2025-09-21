@@ -4,9 +4,9 @@ import time
 
 from lxml import etree
 
-from mdcx.config.manager import config
-from mdcx.models.base.web import get_imgsize
-from mdcx.models.log_buffer import LogBuffer
+from ..base.web import get_imgsize
+from ..config.manager import manager
+from ..models.log_buffer import LogBuffer
 
 
 def get_web_number(html, number):
@@ -127,7 +127,7 @@ async def main(
             LogBuffer.info().write(web_info + debug_info)
 
             # ========================================================================搜索番号
-            html_search, error = await config.async_client.get_text(search_url)
+            html_search, error = await manager.computed.async_client.get_text(search_url)
             if html_search is None:
                 debug_info = f"网络请求错误: {error} "
                 LogBuffer.info().write(web_info + debug_info)
@@ -144,7 +144,7 @@ async def main(
         if real_url:
             debug_info = f"番号地址: {real_url} "
             LogBuffer.info().write(web_info + debug_info)
-            html_content, error = await config.async_client.get_text(real_url)
+            html_content, error = await manager.computed.async_client.get_text(real_url)
             if html_content is None:
                 debug_info = f"网络请求错误: {error} "
                 LogBuffer.info().write(web_info + debug_info)

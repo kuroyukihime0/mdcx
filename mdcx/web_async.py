@@ -2,6 +2,7 @@ import asyncio
 import random
 from collections.abc import Callable
 from io import BytesIO
+from pathlib import Path
 from typing import Any
 
 import aiofiles
@@ -279,11 +280,15 @@ class AsyncWebClient:
             self.log_fn(f"🔴 获取文件大小失败: {url} {error}")
             return None
         if response.status_code < 400:
-            return int(response.headers.get("Content-Length"))
+            try:
+                return int(response.headers.get("Content-Length"))
+            except (ValueError, TypeError):
+                self.log_fn(f"🔴 获取文件大小失败: {url} Content-Length 解析错误")
+                return None
         self.log_fn(f"🔴 获取文件大小失败: {url} HTTP {response.status_code}")
         return None
 
-    async def download(self, url: str, file_path: str, *, use_proxy: bool = True) -> bool:
+    async def download(self, url: str, file_path: Path, *, use_proxy: bool = True) -> bool:
         """
         下载文件. 当文件较大时分块下载
 
@@ -299,7 +304,7 @@ class AsyncWebClient:
         file_size = await self.get_filesize(url, use_proxy=use_proxy)
         # 判断是不是webp文件
         webp = False
-        if file_path.endswith("jpg") and ".webp" in url:
+        if file_path.suffix == "jpg" and ".webp" in url:
             webp = True
 
         MB = 1024**2
@@ -331,7 +336,7 @@ class AsyncWebClient:
             self.log_fn(f"🔴 WebP转换失败: {url} {file_path} {str(e)}")
             return False
 
-    async def _download_chunks(self, url: str, file_path: str, file_size: int, use_proxy: bool = True) -> bool:
+    async def _download_chunks(self, url: str, file_path: Path, file_size: int, use_proxy: bool = True) -> bool:
         """分块下载大文件"""
         # 分块，每块 1 MB
         MB = 1024**2
@@ -377,7 +382,7 @@ class AsyncWebClient:
         self,
         semaphore: asyncio.Semaphore,
         url: str,
-        file_path: str,
+        file_path: Path,
         start: int,
         end: int,
         chunk_id: int,

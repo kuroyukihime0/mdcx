@@ -4,8 +4,9 @@ import time
 
 from lxml import etree
 
-from mdcx.config.manager import config
-from mdcx.models.log_buffer import LogBuffer
+from ..config.enums import Website
+from ..config.manager import manager
+from ..models.log_buffer import LogBuffer
 
 
 def get_web_number(html, number):
@@ -157,7 +158,7 @@ async def main(
 
     if not re.match(r"n\d{4}", number):
         number = number.upper()
-    avsex_url = getattr(config, "avsex_website", "https://gg5.co")
+    avsex_url = manager.config.get_site_url(Website.AVSEX, "https://gg5.co")
     if appoint_url:
         if "http" in appoint_url:
             avsex_url = re.findall(r"(.*//[^/]*)\/", appoint_url)[0]
@@ -186,7 +187,7 @@ async def main(
             LogBuffer.info().write(web_info + debug_info)
 
             # ========================================================================搜索番号
-            html_search, error = await config.async_client.get_text(url_search)
+            html_search, error = await manager.computed.async_client.get_text(url_search)
             if html_search is None:
                 debug_info = f"网络请求错误: {error} "
                 LogBuffer.info().write(web_info + debug_info)
@@ -204,7 +205,7 @@ async def main(
 
             # https://9sex.tv/#/home/video/332642
             # https://paycalling.com/web/video?id=340715
-            html_content, error = await config.async_client.get_text(real_url)
+            html_content, error = await manager.computed.async_client.get_text(real_url)
             if html_content is None:
                 debug_info = f"网络请求错误: {error} "
                 LogBuffer.info().write(web_info + debug_info)

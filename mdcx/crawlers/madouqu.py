@@ -5,9 +5,10 @@ from datetime import datetime
 
 from lxml import etree
 
-from mdcx.config.manager import config
-from mdcx.crawlers.guochan import get_extra_info, get_number_list
-from mdcx.models.log_buffer import LogBuffer
+from ..config.enums import Website
+from ..config.manager import manager
+from ..models.log_buffer import LogBuffer
+from .guochan import get_extra_info, get_number_list
 
 
 def get_actor_photo(actor):
@@ -86,7 +87,7 @@ async def main(
     LogBuffer.info().write(" \n    🌐 madouqu")
     debug_info = ""
     real_url = appoint_url
-    madouqu_url = getattr(config, "madouqu_website", False)
+    madouqu_url = manager.config.get_site_url(Website.MADOUQU, "https://madouqu.com")
 
     try:
         if not real_url:
@@ -94,11 +95,11 @@ async def main(
             number_list, filename_list = get_number_list(number, appoint_number, file_path)
             n_list = number_list[:1] + filename_list
             for each in n_list:
-                real_url = f"{madouqu_url}/?s={each}" if madouqu_url else f"https://madouqu.com/?s={each}"
+                real_url = f"{madouqu_url}/?s={each}"
                 # real_url = 'https://madouqu.com/?s=XSJ-138.%E5%85%BB%E5%AD%90%E7%9A%84%E7%A7%98%E5%AF%86%E6%95%99%E5%AD%A6EP6'
                 debug_info = f"请求地址: {real_url} "
                 LogBuffer.info().write(web_info + debug_info)
-                response, error = await config.async_client.get_text(real_url)
+                response, error = await manager.computed.async_client.get_text(real_url)
 
                 if response is None:
                     debug_info = f"网络请求错误: {error}"
@@ -115,7 +116,7 @@ async def main(
 
         debug_info = f"番号地址: {real_url} "
         LogBuffer.info().write(web_info + debug_info)
-        response, error = await config.async_client.get_text(real_url)
+        response, error = await manager.computed.async_client.get_text(real_url)
 
         if response is None:
             debug_info = f"没有找到数据 {error} "

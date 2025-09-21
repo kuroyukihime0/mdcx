@@ -4,7 +4,6 @@ import concurrent.futures
 import contextlib
 import ctypes
 import inspect
-import os
 import random
 import re
 import threading
@@ -13,10 +12,12 @@ import traceback
 import unicodedata
 from collections.abc import Coroutine
 from concurrent.futures import Future
+from pathlib import Path
 from threading import Thread
 from typing import Any, TypeVar
 
-from mdcx.consts import IS_NFC, IS_WINDOWS, ManualConfig
+from ..consts import IS_NFC
+from ..manual import ManualConfig
 
 T = TypeVar("T")
 
@@ -156,10 +157,8 @@ def get_current_time() -> str:
     return time.strftime("%H:%M:%S", time.localtime())
 
 
-def get_used_time(start_time: float) -> int:
-    return round(
-        (time.time() - start_time),
-    )
+def get_used_time(start_time: float) -> float:
+    return round((time.time() - start_time), 2)
 
 
 def get_real_time(t) -> str:
@@ -168,7 +167,7 @@ def get_real_time(t) -> str:
 
 def add_html(text: str) -> str:
     # 特殊字符转义
-    text = text.replace("=http", "🔮🧿⚔️")  # 例外不转换的
+    text = text.replace('href="https', "🔮🧿⚔️")  # 例外不转换的
 
     # 替换链接为超链接
     url_list = re.findall(r"http[s]?://\S+", text)
@@ -178,7 +177,7 @@ def add_html(text: str) -> str:
         for each_url in url_list:
             new_url = f'<a href="{each_url}">{each_url}</a>'
             text = text.replace(each_url, new_url)
-    text = text.replace("🔮🧿⚔️", "=http")  # 还原不转换的
+    text = text.replace("🔮🧿⚔️", 'href="https')  # 还原不转换的
 
     # 链接放在span里，避免点击后普通文本变超链接，设置样式为pre-wrap（保留空格换行）
     return f'<span style="white-space: pre-wrap;">{text}</span>'
@@ -186,7 +185,7 @@ def add_html(text: str) -> str:
 
 def clean_list(a: str) -> str:
     """
-    移除逗号分隔的字符串中的重复项, 同时移除每项首尾的空格.
+    移除逗号分隔的字符串中的重复项, 同时移除每项首尾的空格, 并保持顺序.
     """
     return ",".join(dict.fromkeys(w.strip() for w in a.split(",") if w.strip()).keys())
 
@@ -218,13 +217,6 @@ def kill_a_thread(t: Thread):
     except Exception:
         print(traceback.format_exc())
         _async_raise(t.ident, SystemExit)
-
-
-def get_user_agent() -> str:
-    temp_l = random.randint(109, 129)
-    temp_m = random.randint(1, 5563)
-    temp_n = random.randint(1, 180)
-    return f"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/{temp_l}.0.{temp_m}.{temp_n} Safari/537.36"
 
 
 def get_random_headers() -> dict:
@@ -383,10 +375,6 @@ def get_random_headers() -> dict:
     return headers
 
 
-def convert_path(path: str) -> str:
-    return path.replace("/", "\\") if IS_WINDOWS else path.replace("\\", "/")
-
-
 def singleton(cls):
     _instance = {}
 
@@ -404,11 +392,9 @@ def nfd2c(path: str) -> str:
     return unicodedata.normalize("NFC", path) if IS_NFC else unicodedata.normalize("NFD", path)
 
 
-def split_path(path: str) -> tuple[str, str]:
-    if "\\" in path:
-        p, f = os.path.split(path.replace("\\", "/"))
-        return p.replace("/", "\\"), f
-    return os.path.split(path)
+def split_path(path: str | Path) -> tuple[Path, str]:
+    path = Path(path)
+    return path.parent, path.name
 
 
 def get_new_release(release: str, release_rule: str) -> str:

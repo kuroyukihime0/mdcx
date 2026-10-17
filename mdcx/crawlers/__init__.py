@@ -26,6 +26,9 @@ from . import (
     javbus,
     javday,
     javlibrary_new,
+    javmix,
+    javpop,
+    javstore,
     kin8,
     love6,
     lulubar,
@@ -36,6 +39,7 @@ from . import (
     mywife,
     official,
     prestige,
+    sextb,
     theporndb,
     xcity,
 )
@@ -70,6 +74,9 @@ CRAWLER_FUNCS: list[tuple[Website, Callable]] = [
     (Website.JAVBUS, javbus.main),
     (Website.JAVDAY, javday.main),
     (Website.JAVLIBRARY, javlibrary_new.main),  # lang
+    (Website.JAVMIX, javmix.main),
+    (Website.JAVPOP, javpop.main),
+    (Website.JAVSTORE, javstore.main),
     (Website.KIN8, kin8.main),
     (Website.LOVE6, love6.main),
     (Website.LULUBAR, lulubar.main),
@@ -79,6 +86,7 @@ CRAWLER_FUNCS: list[tuple[Website, Callable]] = [
     (Website.MYWIFE, mywife.main),
     (Website.OFFICIAL, official.main),
     (Website.PRESTIGE, prestige.main),
+    (Website.SEXTB, sextb.main),
     (Website.THEPORNDB, theporndb.main),
     (Website.XCITY, xcity.main),
 ]

@@ -524,6 +524,11 @@ class Website(Enum):
     GETCHU_DMM = "getchu_dmm"
     OFFICIAL = "official"
 
+    JAVMIX = "javmix"
+    SEXTB = "sextb"
+    JAVPOP = "javpop"
+    JAVSTORE = "javstore"
+
 
 class Language(Enum):
     UNDEFINED = "undefined"

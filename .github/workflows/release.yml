@@ -26,8 +26,8 @@ jobs:
 
           # https://docs.github.com/en/actions/using-github-hosted-runners/about-github-hosted-runners/about-github-hosted-runners
 
-          items+=('{"build": "macos", "os": "macos-latest", "arch": "aarch64"}')
-          items+=('{"build": "macos", "os": "macos-13", "arch": "x86_64"}')
+          # items+=('{"build": "macos", "os": "macos-latest", "arch": "aarch64"}')
+          # items+=('{"build": "macos", "os": "macos-13", "arch": "x86_64"}')
 
           items+=('{"build": "windows", "os": "windows-latest", "arch": "x86_64"}')
 
@@ -86,7 +86,7 @@ jobs:
 
       - name: Get changelog
         id: get-changelog
-        if: ${{ matrix.build == 'macos' }}
+        shell: bash
         run: |
           echo 'CHANGELOG<<EOF' >> $GITHUB_OUTPUT
           cat changelog.md >> $GITHUB_OUTPUT
@@ -111,4 +111,5 @@ jobs:
           asset_name: MDCx-$tag-${{ matrix.build }}-${{ matrix.arch }}${{ matrix.tail }}-${{ github.sha }}.exe
           file: dist/MDCx.exe
           prerelease: ${{ !startsWith(github.event.inputs.tag || github.ref_name, '220') }}
+          body: ${{ steps.get-changelog.outputs.CHANGELOG }}
           tag: ${{ github.event.inputs.tag || github.ref }}
